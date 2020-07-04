@@ -8,6 +8,8 @@ class App extends Component {
 
     this.state = {
       newTodo: '',
+      editing: false,
+      editingIndex: null,
       todos: [
         {
           id: 1,
@@ -34,7 +36,9 @@ class App extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.addTodo = this.addTodo.bind(this);
-    this.deleteTodo = this.deleteTodo.bind(this)
+    this.deleteTodo = this.deleteTodo.bind(this);
+    this.updateTodo = this.updateTodo.bind(this);
+    this.editTodo = this.editTodo.bind(this)
   };
 
   handleChange(event) {
@@ -70,6 +74,30 @@ class App extends Component {
   
   }
 
+  editTodo(index) {
+    const todo = this.state.todos[index]
+    this.setState({
+      editing: true,
+      newTodo: todo.name,
+      editingIndex: index
+    })
+  }
+
+  updateTodo(){
+    const todo = this.state.todos[this.state.editingIndex];
+    todo.name = this.state.newTodo;
+
+    const todos = this.state.todos;
+    todos[this.state.editingIndex] = todo
+    
+    this.setState({
+      todos,
+      editing: false,
+      editingIndex: null,
+      newTodo: ''
+    })
+  }
+
   render() {
 
     return (
@@ -79,12 +107,17 @@ class App extends Component {
 
           <input name="todo" type="text" className="form-control my-4" placeholder="Add a new todo" onChange={this.handleChange} value={this.state.newTodo}/>
 
-          <button onClick={this.addTodo} className="btn btn-info mb-3">Add todo</button>
+    <button onClick={this.state.editing ? this.updateTodo : this.addTodo} className="btn btn-info mb-3">{this.state.editing ? 'Update todo' : 'Add todo'}</button>
 
-
-          <ul className="list-group">
+    {
+    !this.state.editing && <ul className="list-group">
             {this.state.todos.map((item, index) => {
               return <li key={item.id} className="list-group-item">
+
+              <button onClick={() => {
+                  this.editTodo(index)
+                }} className="btn btn-info btn-sm mr-4">U</button>
+
                 {item.name}
 
                 <button onClick={() => {
@@ -93,6 +126,8 @@ class App extends Component {
                 </li>
             })}
           </ul>
+          }
+          
         </div>
       </div>
     )
