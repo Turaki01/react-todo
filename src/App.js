@@ -60,7 +60,14 @@ class App extends Component {
   }
 
   deleteTodo(index) {
-    console.log(index)
+    const todos = this.state.todos;
+
+    delete todos[index]
+
+    this.setState({
+      todos
+    })
+  
   }
 
   render() {
@@ -73,6 +80,7 @@ class App extends Component {
           <input name="todo" type="text" className="form-control my-4" placeholder="Add a new todo" onChange={this.handleChange} value={this.state.newTodo}/>
 
           <button onClick={this.addTodo} className="btn btn-info mb-3">Add todo</button>
+
 
           <ul className="list-group">
             {this.state.todos.map((item, index) => {
