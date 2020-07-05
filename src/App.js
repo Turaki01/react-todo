@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { Component } from 'react';
 import './App.css';
 import ListItem from './listItem'
@@ -12,29 +13,10 @@ class App extends Component {
       editing: false,
       notification: null,
       editingIndex: null,
-      todos: [
-        {
-          id: 1,
-          name: 'Buy bread'
-        },
-      {
-        id: 2,
-        name: 'Write code'
-      },
-      {
-        id: 3,
-        name: 'Play F1'
-      },
-      {
-        id: 4,
-        name: 'Wash clothes'
-      },
-      {
-        id: 5,
-        name: 'Commit to github'
-      }
-    ]
+      todos: []
     }
+
+    this.apiUrl = 'https://5eedea204cbc3400163313d1.mockapi.io';
 
     this.handleChange = this.handleChange.bind(this);
     this.addTodo = this.addTodo.bind(this);
@@ -44,6 +26,12 @@ class App extends Component {
     this.generateTodoId = this.generateTodoId.bind(this);
     this.alert = this.alert.bind(this)
   };
+
+  async componentDidMount() {
+    const response = await axios.get(`${this.apiUrl}/todos`);
+
+    this.setState({todos: response.data});
+  }
 
   handleChange(event) {
     this.setState({
@@ -134,7 +122,7 @@ class App extends Component {
 
           {
             this.state.notification && 
-            <div className="mt-3 alert alert-success">
+            <div className="mt-4 alert alert-success">
             <p className="text-center mb-0">{this.state.notification}</p>
           </div>
           }
@@ -143,7 +131,7 @@ class App extends Component {
 
           <input name="todo" type="text" className="form-control my-4" placeholder="Add a new todo" onChange={this.handleChange} value={this.state.newTodo}/>
 
-    <button onClick={this.state.editing ? this.updateTodo : this.addTodo} className="btn btn-info mb-3">{this.state.editing ? 'Update todo' : 'Add todo'}</button>
+    <button onClick={this.state.editing ? this.updateTodo : this.addTodo} className="btn btn-success mb-3" disabled={this.state.newTodo.length < 5}>{this.state.editing ? 'Update todo' : 'Add todo'}</button>
 
     {
     !this.state.editing && <ul className="list-group">
