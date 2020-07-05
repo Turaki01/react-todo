@@ -1,7 +1,8 @@
 import axios from 'axios';
 import React, { Component } from 'react';
 import './App.css';
-import ListItem from './listItem'
+import ListItem from './listItem';
+import loadingGif from './loading.gif'
 
 class App extends Component {
 
@@ -13,7 +14,8 @@ class App extends Component {
       editing: false,
       notification: null,
       editingIndex: null,
-      todos: []
+      todos: [],
+      loading: true
     }
 
     this.apiUrl = 'https://5eedea204cbc3400163313d1.mockapi.io';
@@ -29,7 +31,10 @@ class App extends Component {
   async componentDidMount() {
     const response = await axios.get(`${this.apiUrl}/todos`);
 
-    this.setState({todos: response.data});
+    this.setState({
+      todos: response.data,
+      loading: false
+    });
   }
 
   handleChange(event) {
@@ -91,12 +96,20 @@ class App extends Component {
       }, 2000)
   }
 
-  updateTodo(){
+  async updateTodo(){
+
     const todo = this.state.todos[this.state.editingIndex];
+
+    const response = await axios.put(`${this.apiUrl}/todos/${todo.id}`, {
+      name: this.state.newTodo
+    });
+
+    console.log(response)
+
     todo.name = this.state.newTodo;
 
     const todos = this.state.todos;
-    todos[this.state.editingIndex] = todo
+    todos[this.state.editingIndex] = response.data;
     
     this.setState({
       todos,
@@ -128,7 +141,13 @@ class App extends Component {
     <button onClick={this.state.editing ? this.updateTodo : this.addTodo} className="btn btn-success mb-3" disabled={this.state.newTodo.length < 5}>{this.state.editing ? 'Update todo' : 'Add todo'}</button>
 
     {
-    !this.state.editing && <ul className="list-group">
+      this.state.loading && <div>
+        <img src={loadingGif} alt=""/>
+      </div>
+    }
+
+    {
+    (!this.state.editing || this.state.loading) && <ul className="list-group">
             {this.state.todos.map((item, index) => {
 
               return <ListItem 
