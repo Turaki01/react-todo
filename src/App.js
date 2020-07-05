@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import ListItem from './listItem'
 
 class App extends Component {
 
@@ -9,6 +10,7 @@ class App extends Component {
     this.state = {
       newTodo: '',
       editing: false,
+      notification: null,
       editingIndex: null,
       todos: [
         {
@@ -38,7 +40,9 @@ class App extends Component {
     this.addTodo = this.addTodo.bind(this);
     this.deleteTodo = this.deleteTodo.bind(this);
     this.updateTodo = this.updateTodo.bind(this);
-    this.editTodo = this.editTodo.bind(this)
+    this.editTodo = this.editTodo.bind(this);
+    this.generateTodoId = this.generateTodoId.bind(this);
+    this.alert = this.alert.bind(this)
   };
 
   handleChange(event) {
@@ -47,10 +51,20 @@ class App extends Component {
     });
   };
 
+  generateTodoId() {
+      const lastTodo = this.state.todos[this.state.todos.length - 1]
+
+      if(lastTodo) {
+        return lastTodo.id + 1
+      } 
+
+      return 1;
+  }
+
   addTodo() {
     const newTodo = {
       name: this.state.newTodo,
-      id: this.state.todos[this.state.todos.length - 1].id + 1
+      id: this.generateTodoId()
     }
 
     const todos = this.state.todos;
@@ -60,7 +74,9 @@ class App extends Component {
     this.setState({
       todos: todos,
       newTodo: ''
-    })
+    });
+
+    this.alert('Todo added successfully.');
   }
 
   deleteTodo(index) {
@@ -71,6 +87,8 @@ class App extends Component {
     this.setState({
       todos
     })
+
+    this.alert('Todo deleted successfully.');
   
   }
 
@@ -81,6 +99,14 @@ class App extends Component {
       newTodo: todo.name,
       editingIndex: index
     })
+  }
+
+  alert(notification) {
+      this.setState({notification});
+
+      setTimeout(() => {
+        this.setState({notification: null})
+      }, 2000)
   }
 
   updateTodo(){
@@ -95,7 +121,9 @@ class App extends Component {
       editing: false,
       editingIndex: null,
       newTodo: ''
-    })
+    });
+
+    this.alert('Todo updated successfully.');
   }
 
   render() {
@@ -103,6 +131,14 @@ class App extends Component {
     return (
       <div className="App">
         <div className="container">
+
+          {
+            this.state.notification && 
+            <div className="mt-3 alert alert-success">
+            <p className="text-center mb-0">{this.state.notification}</p>
+          </div>
+          }
+          
           <h2 className="p-4">Todo App</h2>
 
           <input name="todo" type="text" className="form-control my-4" placeholder="Add a new todo" onChange={this.handleChange} value={this.state.newTodo}/>
@@ -112,18 +148,19 @@ class App extends Component {
     {
     !this.state.editing && <ul className="list-group">
             {this.state.todos.map((item, index) => {
-              return <li key={item.id} className="list-group-item">
 
-              <button onClick={() => {
-                  this.editTodo(index)
-                }} className="btn btn-info btn-sm mr-4">U</button>
+              return <ListItem 
 
-                {item.name}
+              key={item.id}
 
-                <button onClick={() => {
-                  this.deleteTodo(index)
-                }} className="btn btn-danger btn-sm ml-4">X</button>
-                </li>
+              item={item} 
+
+              editTodo={() => {this.editTodo(index)}} 
+
+              deleteTodo={() => {this.deleteTodo(index)}}
+
+              />
+
             })}
           </ul>
           }
