@@ -44,6 +44,7 @@ class App extends Component {
   };
 
   async addTodo() {
+    this.setState({loading: true});
 
     const response = await axios.post(`${this.apiUrl}/todos`, {
       name: this.state.newTodo
@@ -56,13 +57,15 @@ class App extends Component {
 
     this.setState({
       todos: todos,
-      newTodo: ''
+      newTodo: '',
+      loading: false
     });
 
     this.alert('Todo added successfully.');
   }
 
   async deleteTodo(index) {
+    this.setState({loading: true});
     const todos = this.state.todos;
 
     const todo = this.state.todos[index];
@@ -72,7 +75,8 @@ class App extends Component {
     delete todos[index]
 
     this.setState({
-      todos
+      todos,
+      loading: false
     })
 
     this.alert('Todo deleted successfully.');
@@ -98,6 +102,7 @@ class App extends Component {
 
   async updateTodo(){
 
+    this.setState({loading: true});
     const todo = this.state.todos[this.state.editingIndex];
 
     const response = await axios.put(`${this.apiUrl}/todos/${todo.id}`, {
@@ -115,7 +120,8 @@ class App extends Component {
       todos,
       editing: false,
       editingIndex: null,
-      newTodo: ''
+      newTodo: '',
+      loading: false
     });
 
     this.alert('Todo updated successfully.');
